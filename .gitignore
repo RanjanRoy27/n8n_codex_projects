@@ -1,0 +1,21 @@
+# Ignore nested repo and local secret folders
+n8n-mcp/
+secrets/
+
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.*
+
+# Editor and system files
+.vscode/
+.idea/
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

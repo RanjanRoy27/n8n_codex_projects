@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Abroad Chain Current Automation Improvement Plan</title>
+  <style>
+    :root {
+      --navy: #1A1A2E;
+      --gold: #C9A84C;
+      --teal: #1ABC9C;
+      --ink: #20242d;
+      --muted: #5d6472;
+      --line: #dde2ea;
+      --soft: #f6f8fb;
+      --warn: #fff6dc;
+      --ok: #eafaf4;
+      --later: #eef4ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #ffffff;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.55;
+    }
+
+    header {
+      background: var(--navy);
+      color: #ffffff;
+      padding: 34px 28px 30px;
+      border-bottom: 6px solid var(--gold);
+    }
+
+    header .eyebrow {
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    header p {
+      max-width: 900px;
+      margin: 14px 0 0;
+      color: #eef1f6;
+      font-size: 15px;
+    }
+
+    main {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    section {
+      padding: 22px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      color: var(--navy);
+      font-size: 21px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 18px 0 8px;
+      color: var(--navy);
+      font-size: 16px;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0 0 12px;
+    }
+
+    ul,
+    ol {
+      margin: 10px 0 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 6px 0;
+    }
+
+    code {
+      padding: 2px 5px;
+      border: 1px solid #d7dce5;
+      border-radius: 4px;
+      background: #f3f5f8;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 90%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: var(--soft);
+      color: var(--navy);
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .meta {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 13px 14px;
+      background: #ffffff;
+    }
+
+    .meta strong {
+      display: block;
+      color: var(--navy);
+      font-size: 12px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .callout {
+      border-left: 5px solid var(--gold);
+      background: var(--warn);
+      padding: 14px 16px;
+      margin: 14px 0;
+    }
+
+    .success {
+      border-left-color: var(--teal);
+      background: var(--ok);
+    }
+
+    .later {
+      border-left-color: #4d7bd9;
+      background: var(--later);
+    }
+
+    .steps {
+      counter-reset: step;
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      min-height: 44px;
+      padding: 10px 12px 10px 54px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      margin: 9px 0;
+      background: #ffffff;
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 12px;
+      top: 10px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      background: #ffffff;
+    }
+
+    .panel h3 {
+      margin-top: 0;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    footer {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 18px 28px 34px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 760px) {
+      header,
+      main,
+      footer {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      h1 {
+        font-size: 25px;
+      }
+
+      .meta-grid,
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="eyebrow">Abroad Chain Automation Planning Baseline</div>
+    <h1>Current n8n Automation Improvement Plan</h1>
+    <p>
+      This document preserves the current planning context for the Abroad Chain daily digital marketer content workflow.
+      It scopes improvements from the automation already built, while using the SOP as a reference for quality and future maturity.
+    </p>
+    <div class="meta-grid">
+      <div class="meta">
+        <strong>Workflow</strong>
+        Daily Digital Marketer Content Workflow
+      </div>
+      <div class="meta">
+        <strong>Workflow ID</strong>
+        <code>0faiT7g7k8PI3kVI</code>
+      </div>
+      <div class="meta">
+        <strong>Phase</strong>
+        No-new-API improvement phase
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h2>1. Conversation Context</h2>
+      <p>
+        The user asked to analyze the project folder, identify what is important, and plan improvements for the current n8n automation.
+        The key constraint is that the scope must come from the automation already built, not from the full SOP target state.
+      </p>
+      <ul>
+        <li>The SOP is a source of insight, quality rules, and future direction.</li>
+        <li>The current automation is the implementation anchor.</li>
+        <li>The present phase stays low-dependency: no Meta API, no Canva API, no Notion migration, and no auto-publishing.</li>
+        <li>The human still reviews, designs, and schedules final content in Meta Business Suite.</li>
+      </ul>
+      <div class="callout">
+        <strong>Planning principle:</strong> improve the built workflow first, then move toward the deeper SOP over later phases.
+      </div>
+    </section>
+
+    <section>
+      <h2>2. Project Files Reviewed</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>File</th>
+            <th>Role In Planning</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>project/aboard chain/Abroad Chain - Daily Digital Marketer Content Workflow.json</code></td>
+            <td>Current n8n workflow export and main source of truth for near-term scope.</td>
+          </tr>
+          <tr>
+            <td><code>project/aboard chain/abroad_chain_content_agent_sop.html</code></td>
+            <td>Detailed client SOP for content agent behavior, quality rules, pillars, research, captions, visuals, KPIs, and future maturity.</td>
+          </tr>
+          <tr>
+            <td><code>project/aboard chain/abroad_chain_workflow_setup_guide.html</code></td>
+            <td>Handover/setup guide for the 22-node workflow and client requirements.</td>
+          </tr>
+          <tr>
+            <td><code>docs/abroad_chain_workflow_setup_guide.html</code></td>
+            <td>Existing docs copy of the workflow setup guide.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>3. Current Automation Summary</h2>
+      <div class="two-col">
+        <div class="panel">
+          <h3>Workflow Facts</h3>
+          <ul>
+            <li>22-node n8n workflow.</li>
+            <li>Workflow ID: <code>0faiT7g7k8PI3kVI</code>.</li>
+            <li>Local URL: <code>http://localhost:5678/workflow/0faiT7g7k8PI3kVI</code>.</li>
+            <li>Inactive at review time.</li>
+            <li>Timezone: <code>Asia/Dhaka</code>.</li>
+            <li>Schedule: 9:00 AM, Monday to Saturday.</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Current Flow</h3>
+          <ul>
+            <li>Manual or scheduled trigger starts the run.</li>
+            <li>Brand Config provides central settings.</li>
+            <li>Google Sheets supplies performance and calendar context.</li>
+            <li>HTTP/RSS nodes collect public research signals.</li>
+            <li>OpenAI nodes generate topic, caption, visual brief, and QA decision.</li>
+            <li>IF node routes approved vs revision-needed content.</li>
+            <li>Google Sheets stores the final pack, lead-log task, and tomorrow plan.</li>
+            <li>Set node creates the human Meta Business Suite handoff.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>4. Validation Findings</h2>
+      <div class="callout success">
+        <strong>Status:</strong> the exported workflow and live workflow validation both showed valid structure with 0 blocking errors.
+      </div>
+      <h3>Main Warnings To Address</h3>
+      <ul>
+        <li>AI APIs can hit rate limits or return errors.</li>
+        <li>Google Sheets resource locators are missing useful <code>cachedResultName</code> metadata.</li>
+        <li>Google Sheets append nodes should review value formatting behavior.</li>
+        <li>The approval IF branch should use stronger structured parsing and clearer error routing.</li>
+        <li>The workflow is a long linear chain and may later benefit from sub-workflows.</li>
+      </ul>
+      <p class="muted">
+        These are production-readiness warnings, not blockers. The immediate opportunity is hardening and output quality, not rebuilding from scratch.
+      </p>
+    </section>
+
+    <section>
+      <h2>5. Immediate Improvement Scope</h2>
+      <ol>
+        <li>Add complete prompts to all four OpenAI nodes.</li>
+        <li>Improve structured AI output handling, ideally with a parsing/normalization step before downstream logic.</li>
+        <li>Strengthen the approval gate so it checks a parsed boolean rather than searching raw text.</li>
+        <li>Improve Google Sheets reliability and confirm exact spreadsheet/tab/column mappings.</li>
+        <li>Improve the final content pack structure so humans can use it without digging through raw AI output.</li>
+        <li>Keep Meta/Canva as a human handoff in this phase.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>6. SOP Insights To Use Now</h2>
+      <p>
+        These SOP rules are valuable enough to apply immediately without expanding into the full SOP automation.
+      </p>
+      <ul>
+        <li>Bangla is the primary caption language.</li>
+        <li>Every post must have exactly one CTA.</li>
+        <li>No false, unverifiable, or guaranteed claims.</li>
+        <li>No competitor comparison or competitor naming in content.</li>
+        <li>Human approval is required before publishing.</li>
+        <li>Audience should feel local to Rangpur and Lalmonirhat.</li>
+        <li>Brand style should use Navy and Gold, with Teal only as an accent.</li>
+        <li>Use simplified content pillars for now, then expand toward the SOP's full 10-pillar system later.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>7. Later Upgrade Scope</h2>
+      <div class="callout later">
+        These are intentionally later-phase items because they require additional API access, compliance setup, credentials, or operational process maturity.
+      </div>
+      <ul>
+        <li>Meta API insights for reach, engagement, comments, and post performance.</li>
+        <li>Meta publishing or scheduling automation.</li>
+        <li>Canva API or design automation.</li>
+        <li>Notion, Airtable, or CRM migration.</li>
+        <li>Automated comment and DM lead capture.</li>
+        <li>Weekly KPI report automation.</li>
+        <li>Full 10-pillar daily content calendar and self-improvement loop.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>8. Serial Implementation Plan</h2>
+      <ol class="steps">
+        <li><strong>Finalize client inputs and Google Sheet.</strong> Confirm the real Google Sheet ID, tab names, column names, CTA wording, services, locations, target countries, and banned claims.</li>
+        <li><strong>Patch Brand Config.</strong> Replace placeholders and add practical brand fields the prompts need, while keeping credentials inside n8n.</li>
+        <li><strong>Add structured prompts to AI nodes.</strong> Give each OpenAI node a clear role, input context, SOP rules, and required JSON output shape.</li>
+        <li><strong>Add or strengthen output parsing.</strong> Normalize AI responses into stable fields such as <code>topic</code>, <code>pillar</code>, <code>caption</code>, <code>visual_brief</code>, <code>approved</code>, and <code>fixes_needed</code>.</li>
+        <li><strong>Fix approval logic.</strong> Route based on parsed <code>approved === true</code>, not string matching raw model text.</li>
+        <li><strong>Improve Sheets append fields.</strong> Store separate structured columns while keeping a readable <code>Final Pack</code> field for the human scheduler.</li>
+        <li><strong>Validate exported JSON.</strong> Use n8n workflow validation with runtime profile before touching the live workflow.</li>
+        <li><strong>Import or update n8n.</strong> After review, update the live workflow <code>0faiT7g7k8PI3kVI</code> or import a revised copy.</li>
+        <li><strong>Manual test with sample data.</strong> Run from Manual Test Trigger using a sample Performance Log row and valid credentials.</li>
+        <li><strong>Activate only after successful test.</strong> Confirm rows append correctly, QA routes correctly, and human handoff is clear.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>9. Testing Checklist</h2>
+      <ul>
+        <li>Manual trigger succeeds.</li>
+        <li>Research pack aggregates.</li>
+        <li>AI topic output is structured.</li>
+        <li>Caption follows SOP rules.</li>
+        <li>QA routes correctly.</li>
+        <li>Approved row appends to <code>Content Calendar</code>.</li>
+        <li>Revision row appends when rejected.</li>
+        <li>Lead-log task is created only after approval.</li>
+        <li>No auto-posting occurs.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>10. Assumptions</h2>
+      <ul>
+        <li>This document is for planning and visualization only.</li>
+        <li>No workflow JSON or live n8n workflow is changed by creating this file.</li>
+        <li>The next implementation pass should patch the exported JSON first, then update/import into n8n after review.</li>
+        <li>The current improvement phase remains no-new-API.</li>
+        <li>The n8n MCP toolset noted compatibility testing with n8n <code>2.18.3</code>; local n8n version compatibility should be confirmed before deployment.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>11. Future Planning Notes</h2>
+      <p>
+        Use this section as the baseline for the next planning round. The next high-value planning topic is the exact JSON schema for each AI node output and the final Google Sheets column structure.
+      </p>
+      <ul>
+        <li>Define the final structured output schema for topic decision, caption, visual brief, and QA.</li>
+        <li>Decide whether to use one shared parser node or separate parser nodes after each AI step.</li>
+        <li>Decide the exact final columns for <code>Content Calendar</code> and <code>Lead Log</code>.</li>
+        <li>Collect final client-approved CTA wording, phone/WhatsApp link, and banned claims.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    Created as a planning baseline for the Abroad Chain n8n automation. This file documents the agreed scope and does not modify the workflow.
+  </footer>
+</body>
+</html>

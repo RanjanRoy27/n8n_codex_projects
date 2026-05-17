@@ -1,0 +1,933 @@
+{
+  "name": "Abroad Chain - Daily Digital Marketer Content Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual",
+      "name": "Manual Test Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1328,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 1-6"
+            }
+          ]
+        }
+      },
+      "id": "schedule",
+      "name": "Daily Workflow Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1328,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "brand",
+              "value": "Abroad Chain",
+              "type": "string"
+            },
+            {
+              "name": "businessType",
+              "value": "Educational consultancy",
+              "type": "string"
+            },
+            {
+              "name": "market",
+              "value": "Bangladesh",
+              "type": "string"
+            },
+            {
+              "name": "locations",
+              "value": "Lalmonirhat / Rangpur",
+              "type": "string"
+            },
+            {
+              "name": "visualColors",
+              "value": "Navy + Gold",
+              "type": "string"
+            },
+            {
+              "name": "googleSheetId",
+              "value": "PUT_GOOGLE_SHEET_ID_HERE",
+              "type": "string"
+            },
+            {
+              "name": "contentCalendarTab",
+              "value": "Content Calendar",
+              "type": "string"
+            },
+            {
+              "name": "performanceLogTab",
+              "value": "Performance Log",
+              "type": "string"
+            },
+            {
+              "name": "leadLogTab",
+              "value": "Lead Log",
+              "type": "string"
+            },
+            {
+              "name": "noteOnTimes",
+              "value": "Times in node names are SOP stage labels only, not wait/delay logic.",
+              "type": "string"
+            },
+            {
+              "name": "metaPostingMode",
+              "value": "Human schedules/posts in Meta Business Suite after review.",
+              "type": "string"
+            },
+            {
+              "name": "weeklyPillars",
+              "value": "Study abroad basics; Parent trust and safety; Scholarship and finance; Admissions and visa readiness; Student success story; Local FAQ and objection handling",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "config",
+      "name": "Brand Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1088,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{$('Brand Config').item.json.googleSheetId}}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Performance Log",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "performance",
+      "name": "Read Yesterday Platform Audit From Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -800,
+        -416
+      ],
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{$('Brand Config').item.json.googleSheetId}}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Content Calendar",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "calendar-read",
+      "name": "Read Existing Content Calendar From Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -800,
+        -240
+      ],
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://trends.google.com/trends/api/dailytrends",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "hl",
+              "value": "en-US"
+            },
+            {
+              "name": "tz",
+              "value": "-360"
+            },
+            {
+              "name": "geo",
+              "value": "BD"
+            },
+            {
+              "name": "ns",
+              "value": "15"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "id": "trends",
+      "name": "Google Trends Bangladesh Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -800,
+        -64
+      ],
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=study%20abroad%20Bangladesh%20education%20consultancy&hl=en-BD&gl=BD&ceid=BD:en",
+        "options": {}
+      },
+      "id": "news-study",
+      "name": "Google News Study Abroad Research",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -800,
+        128
+      ],
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=HSC%20Bangladesh%20academic%20calendar%20admission&hl=en-BD&gl=BD&ceid=BD:en",
+        "options": {}
+      },
+      "id": "news-hsc",
+      "name": "HSC Academic Calendar News",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -800,
+        304
+      ],
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=university%20scholarship%20admission%20Bangladesh%20students&hl=en-BD&gl=BD&ceid=BD:en",
+        "options": {}
+      },
+      "id": "news-uni",
+      "name": "University Scholarship Intake News",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -800,
+        480
+      ],
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://www.facebook.com/ads/library/",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "active_status",
+              "value": "all"
+            },
+            {
+              "name": "ad_type",
+              "value": "all"
+            },
+            {
+              "name": "country",
+              "value": "BD"
+            },
+            {
+              "name": "q",
+              "value": "study abroad Bangladesh"
+            },
+            {
+              "name": "search_type",
+              "value": "keyword_unordered"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "id": "adlibrary-public",
+      "name": "Public Meta Ad Library Page Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -800,
+        672
+      ],
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "numberInputs": 7
+      },
+      "id": "merge",
+      "name": "Merge Audit Research Calendar Inputs",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -464,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "researchPack",
+        "options": {}
+      },
+      "id": "aggregate",
+      "name": "Aggregate Daily Research Pack",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "chatModel": "gpt-4o-mini",
+        "options": {
+          "temperature": 0.35
+        },
+        "requestOptions": {}
+      },
+      "id": "topic-ai",
+      "name": "AI Topic Decision",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.1,
+      "position": [
+        64,
+        128
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "chatModel": "gpt-4o-mini",
+        "options": {
+          "temperature": 0.65
+        },
+        "requestOptions": {}
+      },
+      "id": "caption-ai",
+      "name": "AI Bangla Caption Writer",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.1,
+      "position": [
+        320,
+        128
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "chatModel": "gpt-4o-mini",
+        "options": {
+          "temperature": 0.45
+        },
+        "requestOptions": {}
+      },
+      "id": "visual-ai",
+      "name": "AI Canva Visual Brief",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.1,
+      "position": [
+        592,
+        128
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "chatModel": "gpt-4o-mini",
+        "options": {
+          "temperature": 0.2
+        },
+        "requestOptions": {}
+      },
+      "id": "qa-ai",
+      "name": "AI Editor QA Approval",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.1,
+      "position": [
+        848,
+        128
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "leftValue": "={{String($json.text || $json.output || JSON.stringify($json)).toLowerCase().includes('\"approved\": true') || String($json.text || $json.output || JSON.stringify($json)).toLowerCase().includes('approved: true')}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "approved-if",
+      "name": "Approved For Human Meta Scheduling?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1104,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{$('Brand Config').item.json.googleSheetId}}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Content Calendar",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{$now.toFormat('yyyy-MM-dd')}}",
+            "Brand": "Abroad Chain",
+            "Status": "Ready for human Meta scheduling",
+            "Facebook Time": "8 PM",
+            "Instagram Time": "7 PM",
+            "Location Tags": "Lalmonirhat / Rangpur",
+            "Final Pack": "={{String($json.text || $json.output || JSON.stringify($json))}}",
+            "Meta Handoff": "Human to schedule in Meta Business Suite; add alt text and location tags."
+          },
+          "matchingColumns": []
+        },
+        "options": {}
+      },
+      "id": "calendar-append",
+      "name": "Append Final Pack To Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1360,
+        32
+      ],
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{$('Brand Config').item.json.googleSheetId}}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Lead Log",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{$now.toFormat('yyyy-MM-dd')}}",
+            "Task": "Reply to all comments and DMs from yesterday post",
+            "Lead Name": "",
+            "Phone": "",
+            "Location": "Lalmonirhat / Rangpur",
+            "Source": "Yesterday social post engagement",
+            "Status": "To review manually",
+            "Next Follow Up": "={{$now.plus({days: 1}).toFormat('yyyy-MM-dd')}}",
+            "Notes": "Log each real inquiry here after replying."
+          },
+          "matchingColumns": []
+        },
+        "options": {}
+      },
+      "id": "lead-log",
+      "name": "Append Engagement Lead Log Template To Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1632,
+        32
+      ],
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{$('Brand Config').item.json.googleSheetId}}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Content Calendar",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{$now.plus({days: 1}).toFormat('yyyy-MM-dd')}}",
+            "Brand": "Abroad Chain",
+            "Status": "Planned for tomorrow",
+            "Facebook Time": "",
+            "Instagram Time": "",
+            "Location Tags": "Lalmonirhat / Rangpur",
+            "Final Pack": "Prepare tomorrow topic from today's research gaps; check Google Trends, HSC/news, and existing calendar before writing.",
+            "Meta Handoff": "Not ready yet - planning row only."
+          },
+          "matchingColumns": []
+        },
+        "options": {}
+      },
+      "id": "tomorrow-plan",
+      "name": "Append Tomorrow Plan To Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1888,
+        32
+      ],
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "handoff_status",
+              "value": "Ready for human scheduling in Meta Business Suite",
+              "type": "string"
+            },
+            {
+              "name": "facebook_schedule",
+              "value": "8 PM Asia/Dhaka",
+              "type": "string"
+            },
+            {
+              "name": "instagram_schedule",
+              "value": "7 PM Asia/Dhaka",
+              "type": "string"
+            },
+            {
+              "name": "location_tags",
+              "value": "Lalmonirhat / Rangpur",
+              "type": "string"
+            },
+            {
+              "name": "instruction",
+              "value": "Use the Google Sheets final pack, add the visual from Canva, add alt text, tag location, then schedule manually.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "handoff",
+      "name": "Meta Business Suite Human Handoff",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2144,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{$('Brand Config').item.json.googleSheetId}}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Content Calendar",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{$now.toFormat('yyyy-MM-dd')}}",
+            "Brand": "Abroad Chain",
+            "Status": "Needs human revision",
+            "Facebook Time": "",
+            "Instagram Time": "",
+            "Location Tags": "Lalmonirhat / Rangpur",
+            "Final Pack": "={{String($json.text || $json.output || JSON.stringify($json))}}",
+            "Meta Handoff": "Do not schedule until fixes_needed are resolved."
+          },
+          "matchingColumns": []
+        },
+        "options": {}
+      },
+      "id": "revision",
+      "name": "Needs Human Revision Before Scheduling",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1360,
+        288
+      ],
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Test Trigger": {
+      "main": [
+        [
+          {
+            "node": "Brand Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Brand Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Brand Config": {
+      "main": [
+        [
+          {
+            "node": "Read Yesterday Platform Audit From Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Read Existing Content Calendar From Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Trends Bangladesh Check",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google News Study Abroad Research",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HSC Academic Calendar News",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "University Scholarship Intake News",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Public Meta Ad Library Page Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Yesterday Platform Audit From Sheets": {
+      "main": [
+        [
+          {
+            "node": "Merge Audit Research Calendar Inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Existing Content Calendar From Sheets": {
+      "main": [
+        [
+          {
+            "node": "Merge Audit Research Calendar Inputs",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Google Trends Bangladesh Check": {
+      "main": [
+        [
+          {
+            "node": "Merge Audit Research Calendar Inputs",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Google News Study Abroad Research": {
+      "main": [
+        [
+          {
+            "node": "Merge Audit Research Calendar Inputs",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "HSC Academic Calendar News": {
+      "main": [
+        [
+          {
+            "node": "Merge Audit Research Calendar Inputs",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "University Scholarship Intake News": {
+      "main": [
+        [
+          {
+            "node": "Merge Audit Research Calendar Inputs",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "Public Meta Ad Library Page Check": {
+      "main": [
+        [
+          {
+            "node": "Merge Audit Research Calendar Inputs",
+            "type": "main",
+            "index": 6
+          }
+        ]
+      ]
+    },
+    "Merge Audit Research Calendar Inputs": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Daily Research Pack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Daily Research Pack": {
+      "main": [
+        [
+          {
+            "node": "AI Topic Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Topic Decision": {
+      "main": [
+        [
+          {
+            "node": "AI Bangla Caption Writer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Bangla Caption Writer": {
+      "main": [
+        [
+          {
+            "node": "AI Canva Visual Brief",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Canva Visual Brief": {
+      "main": [
+        [
+          {
+            "node": "AI Editor QA Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Editor QA Approval": {
+      "main": [
+        [
+          {
+            "node": "Approved For Human Meta Scheduling?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approved For Human Meta Scheduling?": {
+      "main": [
+        [
+          {
+            "node": "Append Final Pack To Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Needs Human Revision Before Scheduling",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Final Pack To Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Append Engagement Lead Log Template To Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Engagement Lead Log Template To Sheets": {
+      "main": [
+        [
+          {
+            "node": "Append Tomorrow Plan To Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Tomorrow Plan To Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Meta Business Suite Human Handoff",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timezone": "Asia/Dhaka",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all"
+  },
+  "versionId": "87201912-42b8-437c-921e-cdea4956e1eb",
+  "meta": {
+    "instanceId": "e191097dab4ea9e2c790cdcc5b9489b0650924883af17fab21cada23f4eea3ee"
+  },
+  "id": "0faiT7g7k8PI3kVI",
+  "tags": []
+}

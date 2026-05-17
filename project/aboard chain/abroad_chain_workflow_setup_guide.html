@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Abroad Chain n8n Workflow Setup Guide</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+      color: #172033;
+      margin: 0;
+      background: #f7f8fb;
+    }
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 32px 24px 56px;
+      background: #ffffff;
+    }
+    h1, h2, h3 {
+      line-height: 1.2;
+      color: #0b1f3a;
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 30px;
+    }
+    h2 {
+      border-top: 1px solid #d9deea;
+      padding-top: 24px;
+      margin-top: 32px;
+    }
+    h3 {
+      margin-top: 24px;
+    }
+    .summary {
+      background: #f1f5fb;
+      border-left: 4px solid #1f5fbf;
+      padding: 16px 18px;
+      margin: 20px 0;
+    }
+    .warning {
+      background: #fff8e6;
+      border-left: 4px solid #c78600;
+      padding: 14px 18px;
+      margin: 18px 0;
+    }
+    .ok {
+      background: #eefaf2;
+      border-left: 4px solid #16813a;
+      padding: 14px 18px;
+      margin: 18px 0;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 14px 0 24px;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #d9deea;
+      padding: 10px 12px;
+      vertical-align: top;
+      text-align: left;
+    }
+    th {
+      background: #eef2f8;
+      color: #0b1f3a;
+    }
+    code {
+      background: #eef2f8;
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 0.95em;
+    }
+    pre {
+      background: #101827;
+      color: #eef4ff;
+      padding: 14px;
+      overflow-x: auto;
+      border-radius: 6px;
+    }
+    .node {
+      border: 1px solid #d9deea;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 18px 0;
+      background: #fcfdff;
+    }
+    .node h3 {
+      margin-top: 0;
+    }
+    ul {
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Abroad Chain n8n Workflow Setup Guide</h1>
+
+  <div class="summary">
+    <strong>Workflow:</strong> Abroad Chain - Daily Digital Marketer Content Workflow<br>
+    <strong>Workflow ID:</strong> <code>0faiT7g7k8PI3kVI</code><br>
+    <strong>Local URL:</strong> <code>http://localhost:5678/workflow/0faiT7g7k8PI3kVI</code><br>
+    <strong>Current validation:</strong> Valid, 0 blocking errors, 22 nodes, no Code nodes.<br>
+    <strong>Purpose:</strong> Generate a daily content topic, Bangla caption, Canva visual brief, QA approval, Google Sheets content calendar rows, engagement log template, and a human Meta Business Suite handoff.
+  </div>
+
+  <div class="warning">
+    The times in node names are SOP stage labels only. They do not pause the workflow until those times. The workflow starts at 9:00 AM by schedule and then runs through the whole content production pipeline.
+  </div>
+
+  <h2>What To Ask The Client For</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Ask Client For</th>
+        <th>Why It Is Needed</th>
+        <th>Where It Is Used</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Google account access</td>
+        <td>A Google account that owns or can edit the workflow spreadsheet.</td>
+        <td>Google Sheets nodes need read/write permission for audit logs, content calendar, and lead log.</td>
+        <td>All Google Sheets nodes.</td>
+      </tr>
+      <tr>
+        <td>Google Sheets credential in n8n</td>
+        <td>OAuth connection to the client Google account, or a service account if their Google Workspace allows it.</td>
+        <td>n8n needs authenticated API access to read and append rows.</td>
+        <td>5 Google Sheets nodes.</td>
+      </tr>
+      <tr>
+        <td>Google Sheet ID</td>
+        <td>The spreadsheet URL or ID. Example ID is the long string between <code>/d/</code> and <code>/edit</code> in a Google Sheet URL.</td>
+        <td>The workflow stores this once in the <code>Brand Config</code> node and all Sheets nodes reference it.</td>
+        <td><code>Brand Config.googleSheetId</code>.</td>
+      </tr>
+      <tr>
+        <td>Spreadsheet tabs</td>
+        <td>Create exactly these tabs: <code>Content Calendar</code>, <code>Performance Log</code>, <code>Lead Log</code>.</td>
+        <td>The workflow reads/writes these tab names. If names differ, Sheets nodes will fail.</td>
+        <td>Google Sheets read/append nodes.</td>
+      </tr>
+      <tr>
+        <td>OpenAI API credential</td>
+        <td>OpenAI API key or an n8n OpenAI credential connected by the client.</td>
+        <td>Four AI nodes generate topic decision, caption, visual brief, and QA.</td>
+        <td>All OpenAI nodes.</td>
+      </tr>
+      <tr>
+        <td>Brand basics</td>
+        <td>Final brand name, locations, services, target countries, pricing/offer, CTA wording, preferred language tone, do-not-say list.</td>
+        <td>Improves output quality and prevents wrong claims in posts.</td>
+        <td><code>Brand Config</code> and AI prompts.</td>
+      </tr>
+      <tr>
+        <td>Content pillars</td>
+        <td>Weekly pillars or campaign themes. Current default is study abroad basics, parent trust, scholarship, admissions/visa, success story, local FAQ.</td>
+        <td>The topic decision node uses pillars when choosing the day topic.</td>
+        <td><code>Brand Config.weeklyPillars</code>.</td>
+      </tr>
+      <tr>
+        <td>Yesterday performance data</td>
+        <td>Daily row in <code>Performance Log</code> with reach, engagement rate, lead clicks, top post, what worked.</td>
+        <td>Because this version does not use Meta API, human-entered audit data is read from Sheets.</td>
+        <td><code>09:00 Read Yesterday Platform Audit From Sheets</code>.</td>
+      </tr>
+      <tr>
+        <td>Meta Business Suite access</td>
+        <td>Human poster/designer needs Page and Instagram access in Meta Business Suite.</td>
+        <td>This workflow does not auto-post. A human schedules the final pack manually.</td>
+        <td>Final handoff only.</td>
+      </tr>
+      <tr>
+        <td>Canva/design access</td>
+        <td>Brand kit, logo, font, colors, templates, and designer access to Canva.</td>
+        <td>The workflow produces a Canva brief, not an actual Canva design file.</td>
+        <td><code>12:30 AI Canva Visual Brief</code>.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Required Google Sheet Structure</h2>
+  <p>Create one spreadsheet and add the following tabs. Column names must match the append mappings if you want clean rows.</p>
+
+  <h3>Content Calendar</h3>
+  <pre>Date | Brand | Status | Facebook Time | Instagram Time | Location Tags | Final Pack | Meta Handoff</pre>
+  <p>This tab receives final approved content, revision rows, and tomorrow planning rows.</p>
+
+  <h3>Performance Log</h3>
+  <pre>Date | Platform | Top Post Topic | Reach | Engagement Rate | Lead Clicks | Comments | DMs | What Worked | Notes</pre>
+  <p>This is manually maintained for now. The workflow reads it to simulate the daily Meta Business Suite audit without requiring Meta API credentials.</p>
+
+  <h3>Lead Log</h3>
+  <pre>Date | Task | Lead Name | Phone | Location | Source | Status | Next Follow Up | Notes</pre>
+  <p>This tab receives a daily engagement task template. The human marketer can add real inquiries after replying to comments and DMs.</p>
+
+  <h2>Node-by-Node Configuration Guide</h2>
+
+  <div class="node">
+    <h3>1. Manual Test Trigger</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>Manual Trigger</code></td></tr>
+      <tr><th>Credential Needed</th><td>None.</td></tr>
+      <tr><th>Required Fields</th><td>No fields to configure.</td></tr>
+      <tr><th>Why It Exists</th><td>Lets you run the workflow manually while testing credentials and sheet mappings.</td></tr>
+      <tr><th>Client Needs To Provide</th><td>Nothing.</td></tr>
+    </table>
+  </div>
+
+  <div class="node">
+    <h3>2. Daily Workflow Trigger</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>Schedule Trigger</code></td></tr>
+      <tr><th>Credential Needed</th><td>None.</td></tr>
+      <tr><th>Current Value</th><td>Cron expression: <code>0 9 * * 1-6</code></td></tr>
+      <tr><th>Meaning</th><td>Runs at 9:00 AM, Monday to Saturday, using the workflow timezone <code>Asia/Dhaka</code>.</td></tr>
+      <tr><th>Change If Needed</th><td>Use <code>0 9 * * *</code> for every day, or <code>0 9 * * 0-6</code> for Sunday to Saturday.</td></tr>
+      <tr><th>Why It Exists</th><td>Starts the daily content workflow. The later times in node names are just labels, not actual waiting.</td></tr>
+    </table>
+  </div>
+
+  <div class="node">
+    <h3>3. Brand Config</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>Set / Edit Fields</code></td></tr>
+      <tr><th>Credential Needed</th><td>None.</td></tr>
+      <tr><th>Fields To Review</th><td><code>brand</code>, <code>businessType</code>, <code>market</code>, <code>locations</code>, <code>visualColors</code>, <code>googleSheetId</code>, <code>weeklyPillars</code>.</td></tr>
+      <tr><th>Must Replace</th><td><code>googleSheetId = PUT_GOOGLE_SHEET_ID_HERE</code></td></tr>
+      <tr><th>Suggested Value</th><td>Paste the real spreadsheet ID. Example from URL: <code>https://docs.google.com/spreadsheets/d/SPREADSHEET_ID/edit</code>.</td></tr>
+      <tr><th>Why It Exists</th><td>Central place for brand and spreadsheet settings so every downstream node can reference one source.</td></tr>
+      <tr><th>Client Needs To Provide</th><td>Brand name, target locations, final color palette, content pillars, Google Sheet URL/ID.</td></tr>
+    </table>
+  </div>
+
+  <div class="node">
+    <h3>4. 09:00 Read Yesterday Platform Audit From Sheets</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>Google Sheets</code></td></tr>
+      <tr><th>Credential Needed</th><td>Google Sheets OAuth or service account credential with read access.</td></tr>
+      <tr><th>Resource / Operation</th><td><code>sheet</code> / <code>read</code></td></tr>
+      <tr><th>Document ID</th><td><code>={{$('Brand Config').item.json.googleSheetId}}</code></td></tr>
+      <tr><th>Sheet Name</th><td><code>Performance Log</code></td></tr>
+      <tr><th>Range</th><td><code>'Performance Log'!A:Z</code></td></tr>
+      <tr><th>Options</th><td><code>dataStructure = object</code></td></tr>
+      <tr><th>Why It Exists</th><td>Reads yesterday's performance data: reach, engagement, lead clicks, and what worked.</td></tr>
+      <tr><th>Client Needs To Provide</th><td>Daily performance rows exported or manually entered from Meta Business Suite.</td></tr>
+    </table>
+  </div>
+
+  <div class="node">
+    <h3>5. Read Existing Content Calendar From Sheets</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>Google Sheets</code></td></tr>
+      <tr><th>Credential Needed</th><td>Same Google Sheets credential.</td></tr>
+      <tr><th>Resource / Operation</th><td><code>sheet</code> / <code>read</code></td></tr>
+      <tr><th>Document ID</th><td><code>={{$('Brand Config').item.json.googleSheetId}}</code></td></tr>
+      <tr><th>Sheet Name</th><td><code>Content Calendar</code></td></tr>
+      <tr><th>Range</th><td><code>'Content Calendar'!A:Z</code></td></tr>
+      <tr><th>Why It Exists</th><td>Lets AI avoid repeating topics and see what is already planned or posted.</td></tr>
+      <tr><th>Client Needs To Provide</th><td>Existing content calendar rows if available. Empty tab is okay for initial testing.</td></tr>
+    </table>
+  </div>
+
+  <div class="node">
+    <h3>6. 09:30 Google Trends Bangladesh Check</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>HTTP Request</code></td></tr>
+      <tr><th>Credential Needed</th><td>None. This is a free/no-auth endpoint, but Google may rate-limit or change response behavior.</td></tr>
+      <tr><th>Method</th><td><code>GET</code></td></tr>
+      <tr><th>URL</th><td><code>https://trends.google.com/trends/api/dailytrends</code></td></tr>
+      <tr><th>Query Params</th><td><code>hl=en-US</code>, <code>tz=-360</code>, <code>geo=BD</code>, <code>ns=15</code></td></tr>
+      <tr><th>Response Format</th><td><code>text</code></td></tr>
+      <tr><th>Why It Exists</th><td>Provides Bangladesh trend context for topic choice.</td></tr>
+      <tr><th>Client Needs To Provide</th><td>Nothing, unless they want specific trend keywords or a paid trend/search API later.</td></tr>
+    </table>
+  </div>
+
+  <div class="node">
+    <h3>7. 09:30 Google News Study Abroad Research</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>RSS Read</code></td></tr>
+      <tr><th>Credential Needed</th><td>None.</td></tr>
+      <tr><th>URL</th><td><code>https://news.google.com/rss/search?q=study%20abroad%20Bangladesh%20education%20consultancy&amp;hl=en-BD&amp;gl=BD&amp;ceid=BD:en</code></td></tr>
+      <tr><th>Why It Exists</th><td>Finds current education consultancy and study abroad news signals.</td></tr>
+      <tr><th>Client Needs To Provide</th><td>Optional keyword list: countries, universities, services, target programs.</td></tr>
+    </table>
+  </div>
+
+  <div class="node">
+    <h3>8. 09:30 HSC Academic Calendar News</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>RSS Read</code></td></tr>
+      <tr><th>Credential Needed</th><td>None.</td></tr>
+      <tr><th>URL</th><td><code>https://news.google.com/rss/search?q=HSC%20Bangladesh%20academic%20calendar%20admission&amp;hl=en-BD&amp;gl=BD&amp;ceid=BD:en</code></td></tr>
+      <tr><th>Why It Exists</th><td>Connects content with HSC timing and admission season behavior.</td></tr>
+      <tr><th>Client Needs To Provide</th><td>Any official academic calendar links they trust, if they want stronger source control later.</td></tr>
+    </table>
+  </div>
+
+  <div class="node">
+    <h3>9. 09:30 University Scholarship Intake News</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>RSS Read</code></td></tr>
+      <tr><th>Credential Needed</th><td>None.</td></tr>
+      <tr><th>URL</th><td><code>https://news.google.com/rss/search?q=university%20scholarship%20admission%20Bangladesh%20students&amp;hl=en-BD&amp;gl=BD&amp;ceid=BD:en</code></td></tr>
+      <tr><th>Why It Exists</th><td>Finds scholarship, intake, and university admission hooks for daily content.</td></tr>
+      <tr><th>Client Needs To Provide</th><td>Target destination countries and universities to tune the query later.</td></tr>
+    </table>
+  </div>
+
+  <div class="node">
+    <h3>10. 09:30 Public Meta Ad Library Page Check</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>HTTP Request</code></td></tr>
+      <tr><th>Credential Needed</th><td>None in this version.</td></tr>
+      <tr><th>Method</th><td><code>GET</code></td></tr>
+      <tr><th>URL</th><td><code>https://www.facebook.com/ads/library/</code></td></tr>
+      <tr><th>Query Params</th><td><code>active_status=all</code>, <code>ad_type=all</code>, <code>country=BD</code>, <code>q=study abroad Bangladesh</code>, <code>search_type=keyword_unordered</code></td></tr>
+      <tr><th>Why It Exists</th><td>Attempts a free competitor-ad context check without requiring Meta API access.</td></tr>
+      <tr><th>Important Limitation</th><td>The public page may return HTML, redirects, or limited content. For reliable competitor ad data later, use Meta Ad Library API with an access token.</td></tr>
+      <tr><th>Client Needs To Provide</th><td>Competitor names and keywords. For future API version: Meta developer app/access token.</td></tr>
+    </table>
+  </div>
+
+  <div class="node">
+    <h3>11. Merge Audit Research Calendar Inputs</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>Merge</code></td></tr>
+      <tr><th>Credential Needed</th><td>None.</td></tr>
+      <tr><th>Mode</th><td><code>append</code></td></tr>
+      <tr><th>Number Inputs</th><td><code>7</code></td></tr>
+      <tr><th>Why It Exists</th><td>Combines Sheets audit data, calendar data, trend data, RSS news, and public Ad Library page output into one stream.</td></tr>
+      <tr><th>Client Needs To Provide</th><td>Nothing.</td></tr>
+    </table>
+  </div>
+
+  <div class="node">
+    <h3>12. Aggregate Daily Research Pack</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>Aggregate</code></td></tr>
+      <tr><th>Credential Needed</th><td>None.</td></tr>
+      <tr><th>Aggregate Mode</th><td><code>aggregateAllItemData</code></td></tr>
+      <tr><th>Destination Field</th><td><code>researchPack</code></td></tr>
+      <tr><th>Include</th><td><code>allFields</code></td></tr>
+      <tr><th>Why It Exists</th><td>Packages all research into one JSON field so the AI topic node has a single context object.</td></tr>
+      <tr><th>Client Needs To Provide</th><td>Nothing.</td></tr>
+    </table>
+  </div>
+
+  <div class="node">
+    <h3>13. 10:15 AI Topic Decision</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>OpenAI</code></td></tr>
+      <tr><th>Credential Needed</th><td>OpenAI API credential in n8n.</td></tr>
+      <tr><th>Resource / Operation</th><td><code>chat</code> / <code>complete</code></td></tr>
+      <tr><th>Model</th><td><code>gpt-4o-mini</code></td></tr>
+      <tr><th>Temperature</th><td><code>0.35</code></td></tr>
+      <tr><th>Expected Output</th><td>JSON with <code>selected_topic</code>, <code>target_audience_student_or_parent</code>, <code>emotion_to_trigger</code>, <code>format_carousel_reel_static_or_poll</code>, <code>cta</code>, <code>score_reason</code>, <code>five_line_brief</code>, <code>research_sources_used</code>.</td></tr>
+      <tr><th>Why It Exists</th><td>Implements the SOP topic decision rule: trend interest + pillar alignment + competitor/content gap.</td></tr>
+      <tr><th>Client Needs To Provide</th><td>OpenAI credential, preferred pillars, preferred countries/programs, and any topics to avoid.</td></tr>
+    </table>
+  </div>
+
+  <div class="node">
+    <h3>14. 11:15 AI Bangla Caption Writer</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>OpenAI</code></td></tr>
+      <tr><th>Credential Needed</th><td>OpenAI API credential in n8n.</td></tr>
+      <tr><th>Resource / Operation</th><td><code>chat</code> / <code>complete</code></td></tr>
+      <tr><th>Model</th><td><code>gpt-4o-mini</code></td></tr>
+      <tr><th>Temperature</th><td><code>0.65</code></td></tr>
+      <tr><th>Rules In Prompt</th><td>Bangla caption, 1 hook, 3-5 body lines, clear CTA, 5 hashtags, max 150 words, no jargon, understandable by a parent in Lalmonirhat.</td></tr>
+      <tr><th>Expected Output</th><td>JSON with <code>caption</code>, <code>hook</code>, <code>body</code>, <code>cta</code>, <code>hashtags</code>, <code>word_count</code>, <code>alt_text</code>.</td></tr>
+      <tr><th>Why It Exists</th><td>Turns the chosen topic into usable Bangla copy.</td></tr>
+      <tr><th>Client Needs To Provide</th><td>Tone examples, approved CTA wording, phone/WhatsApp/contact instructions, banned claims.</td></tr>
+    </table>
+  </div>
+
+  <div class="node">
+    <h3>15. 12:30 AI Canva Visual Brief</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>OpenAI</code></td></tr>
+      <tr><th>Credential Needed</th><td>OpenAI API credential in n8n.</td></tr>
+      <tr><th>Resource / Operation</th><td><code>chat</code> / <code>complete</code></td></tr>
+      <tr><th>Model</th><td><code>gpt-4o-mini</code></td></tr>
+      <tr><th>Temperature</th><td><code>0.45</code></td></tr>
+      <tr><th>Prompt Requirements</th><td>Navy + Gold colors, Bangla headline, layout, image style, slide/page copy, designer notes, alt text.</td></tr>
+      <tr><th>Why It Exists</th><td>Produces a brief a human designer can execute in Canva.</td></tr>
+      <tr><th>Client Needs To Provide</th><td>Logo, Canva brand kit, fonts, example designs, image style preferences, prohibited visuals.</td></tr>
+    </table>
+  </div>
+
+  <div class="node">
+    <h3>16. 13:30 AI Editor QA Approval</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>OpenAI</code></td></tr>
+      <tr><th>Credential Needed</th><td>OpenAI API credential in n8n.</td></tr>
+      <tr><th>Resource / Operation</th><td><code>chat</code> / <code>complete</code></td></tr>
+      <tr><th>Model</th><td><code>gpt-4o-mini</code></td></tr>
+      <tr><th>Temperature</th><td><code>0.2</code></td></tr>
+      <tr><th>Expected Output</th><td>JSON with <code>approved</code>, <code>fixes_needed</code>, <code>final_caption</code>, <code>final_visual_brief</code>, <code>alt_text</code>, <code>meta_handoff_notes</code>.</td></tr>
+      <tr><th>Why It Exists</th><td>Checks if the content is clear, specific, simple, brand-fit, and ready for human scheduling.</td></tr>
+      <tr><th>Client Needs To Provide</th><td>Compliance guidelines and approval rules, especially for claims about visa success, scholarships, or guaranteed admission.</td></tr>
+    </table>
+  </div>
+
+  <div class="node">
+    <h3>17. Approved For Human Meta Scheduling?</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>IF</code></td></tr>
+      <tr><th>Credential Needed</th><td>None.</td></tr>
+      <tr><th>Condition</th><td>Checks whether AI QA output includes <code>"approved": true</code> or <code>approved: true</code>.</td></tr>
+      <tr><th>True Path</th><td>Append final pack to <code>Content Calendar</code>.</td></tr>
+      <tr><th>False Path</th><td>Append revision-needed row to <code>Content Calendar</code>.</td></tr>
+      <tr><th>Why It Exists</th><td>Prevents weak content from being marked as ready for Meta scheduling.</td></tr>
+      <tr><th>Client Needs To Provide</th><td>Nothing, unless they want stricter approval logic.</td></tr>
+    </table>
+  </div>
+
+  <div class="node">
+    <h3>18. 14:15 Append Final Pack To Google Sheets</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>Google Sheets</code></td></tr>
+      <tr><th>Credential Needed</th><td>Google Sheets credential with edit access.</td></tr>
+      <tr><th>Resource / Operation</th><td><code>sheet</code> / <code>append</code></td></tr>
+      <tr><th>Sheet Name</th><td><code>Content Calendar</code></td></tr>
+      <tr><th>Columns Written</th><td><code>Date</code>, <code>Brand</code>, <code>Status</code>, <code>Facebook Time</code>, <code>Instagram Time</code>, <code>Location Tags</code>, <code>Final Pack</code>, <code>Meta Handoff</code>.</td></tr>
+      <tr><th>Why It Exists</th><td>Saves approved final content for the human Meta scheduler.</td></tr>
+      <tr><th>Client Needs To Provide</th><td>Sheet edit permission and final preferred calendar column names if different.</td></tr>
+    </table>
+  </div>
+
+  <div class="node">
+    <h3>19. 15:00 Append Engagement Lead Log Template To Sheets</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>Google Sheets</code></td></tr>
+      <tr><th>Credential Needed</th><td>Google Sheets credential with edit access.</td></tr>
+      <tr><th>Resource / Operation</th><td><code>sheet</code> / <code>append</code></td></tr>
+      <tr><th>Sheet Name</th><td><code>Lead Log</code></td></tr>
+      <tr><th>Columns Written</th><td><code>Date</code>, <code>Task</code>, <code>Lead Name</code>, <code>Phone</code>, <code>Location</code>, <code>Source</code>, <code>Status</code>, <code>Next Follow Up</code>, <code>Notes</code>.</td></tr>
+      <tr><th>Why It Exists</th><td>Creates the daily engagement and lead logging task. It does not read DMs automatically.</td></tr>
+      <tr><th>Client Needs To Provide</th><td>Lead log columns, follow-up status options, and who owns replies.</td></tr>
+    </table>
+  </div>
+
+  <div class="node">
+    <h3>20. 16:00 Append Tomorrow Plan To Google Sheets</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>Google Sheets</code></td></tr>
+      <tr><th>Credential Needed</th><td>Google Sheets credential with edit access.</td></tr>
+      <tr><th>Resource / Operation</th><td><code>sheet</code> / <code>append</code></td></tr>
+      <tr><th>Sheet Name</th><td><code>Content Calendar</code></td></tr>
+      <tr><th>Why It Exists</th><td>Adds a planning row for tomorrow so the marketer knows what to prepare next.</td></tr>
+      <tr><th>Client Needs To Provide</th><td>Preferred planning status labels and tomorrow planning process if they already have one.</td></tr>
+    </table>
+  </div>
+
+  <div class="node">
+    <h3>21. Meta Business Suite Human Handoff</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>Set / Edit Fields</code></td></tr>
+      <tr><th>Credential Needed</th><td>None.</td></tr>
+      <tr><th>Fields Written</th><td><code>handoff_status</code>, <code>facebook_schedule</code>, <code>instagram_schedule</code>, <code>location_tags</code>, <code>instruction</code>.</td></tr>
+      <tr><th>Current Schedule</th><td>Facebook: <code>8 PM Asia/Dhaka</code>, Instagram: <code>7 PM Asia/Dhaka</code>.</td></tr>
+      <tr><th>Why It Exists</th><td>Final reminder for the human: use Google Sheets final pack, add Canva visual, add alt text, tag location, schedule manually.</td></tr>
+      <tr><th>Client Needs To Provide</th><td>Meta Business Suite access for the human scheduler and final posting SOP.</td></tr>
+    </table>
+  </div>
+
+  <div class="node">
+    <h3>22. Needs Human Revision Before Scheduling</h3>
+    <table>
+      <tr><th>Node Type</th><td><code>Google Sheets</code></td></tr>
+      <tr><th>Credential Needed</th><td>Google Sheets credential with edit access.</td></tr>
+      <tr><th>Resource / Operation</th><td><code>sheet</code> / <code>append</code></td></tr>
+      <tr><th>Sheet Name</th><td><code>Content Calendar</code></td></tr>
+      <tr><th>Status Written</th><td><code>Needs human revision</code></td></tr>
+      <tr><th>Why It Exists</th><td>Captures rejected or uncertain AI output instead of silently losing it.</td></tr>
+      <tr><th>Client Needs To Provide</th><td>Who reviews failed drafts and what approval process they follow.</td></tr>
+    </table>
+  </div>
+
+  <h2>Credential Setup Checklist In n8n</h2>
+  <ol>
+    <li>Create or select a Google Sheet with the three required tabs.</li>
+    <li>In n8n, create/connect a Google Sheets credential for the client account.</li>
+    <li>Open every Google Sheets node and select the same credential.</li>
+    <li>In <code>Brand Config</code>, replace <code>PUT_GOOGLE_SHEET_ID_HERE</code> with the real spreadsheet ID.</li>
+    <li>In n8n, create/connect an OpenAI credential.</li>
+    <li>Open each OpenAI node and select the OpenAI credential.</li>
+    <li>Run <code>Manual Test Trigger</code>.</li>
+    <li>Check that rows are appended to <code>Content Calendar</code> and <code>Lead Log</code>.</li>
+    <li>Review the final content pack before enabling the schedule.</li>
+    <li>Activate the workflow only after the manual run succeeds.</li>
+  </ol>
+
+  <h2>Known Limitations Of This Version</h2>
+  <ul>
+    <li>No auto-posting to Meta. A human schedules in Meta Business Suite.</li>
+    <li>No direct DM/comment reading from Meta. Lead logging is a Google Sheets task template.</li>
+    <li>No Airtable or Notion. The client requested Sheets for now.</li>
+    <li>Public Meta Ad Library page scraping may be unreliable. It is included only as a free/no-auth signal.</li>
+    <li>Google Trends unofficial endpoint may change or rate-limit. It is included because the user requested free/no-auth sources first.</li>
+    <li>AI output is validated by prompt and IF logic, but a human should still review content before posting.</li>
+  </ul>
+
+  <h2>Future Upgrade Options</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Upgrade</th>
+        <th>Extra Client Requirements</th>
+        <th>Benefit</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Meta Graph API audit</td>
+        <td>Meta developer app, page access token, permissions for Page insights.</td>
+        <td>Automatic reach, engagement, comments, and post performance data.</td>
+      </tr>
+      <tr>
+        <td>Meta publishing or scheduling</td>
+        <td>Meta app review, Page/Instagram permissions, connected IG business account.</td>
+        <td>Less manual posting, but higher setup and compliance burden.</td>
+      </tr>
+      <tr>
+        <td>Notion CRM/calendar</td>
+        <td>Notion integration token and shared database.</td>
+        <td>Better project-management view than Sheets.</td>
+      </tr>
+      <tr>
+        <td>Canva API/design automation</td>
+        <td>Canva developer app/API access or approved integration path.</td>
+        <td>Move from visual briefs to actual design generation workflow.</td>
+      </tr>
+      <tr>
+        <td>Structured output parser</td>
+        <td>Additional n8n AI parser nodes.</td>
+        <td>More reliable JSON parsing from OpenAI outputs.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="ok">
+    Recommended first live test: connect Google Sheets and OpenAI credentials, add one sample row to <code>Performance Log</code>, run manually, review the <code>Content Calendar</code> rows, then activate the schedule.
+  </div>
+</main>
+</body>
+</html>
